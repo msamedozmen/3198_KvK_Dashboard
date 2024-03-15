@@ -13,7 +13,7 @@ merged_df = pd.read_excel("merged.xlsx")
 
 
 
-st.set_page_config(page_title="KD 3198 Stats Dashboard",layout="wide")
+st.set_page_config(page_title="KD 3198 Stats Dashboard",layout="wide",theme)
 
 def format_tick_label(x):
     if abs(x) >= 1e9:
