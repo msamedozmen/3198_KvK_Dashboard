@@ -92,6 +92,7 @@ df_grouped.reset_index(inplace=True)
 
 id_options = df_grouped["Governor ID"].tolist()
 name_options = df_grouped["Governor Name"].tolist()
+name_options = name_options.sort()
 id_options.insert(0, "All ID")
 name_options.insert(0, "All Names")
 
