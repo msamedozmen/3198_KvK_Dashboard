@@ -9,6 +9,7 @@ from matplotlib.ticker import FuncFormatter
 
 import plotly.graph_objects as go
 import plotly.express as px
+
 merged_df = pd.read_excel("merged.xlsx")
 
 
@@ -27,12 +28,33 @@ def format_tick_label(x):
 
 @st.cache_data
 def get_data_from_excel(option):
-    if option == "All Kvk":
-        df = pd.read_excel("merged.xlsx")
-    else:
-        option = option.lower()
-        df = pd.read_excel(f"{option}.xlsx")
-    return df 
+    df = pd.read_excel("merged.xlsx")
+    
+    kvk_mapping = {'KvK1': 1, 'kvk2': 2, 'kvk3': 3}
+    df['KvK Numeric'] = df['KvK'].map(kvk_mapping)
+
+
+    groups = df.groupby('Governor ID')
+
+    updated_dfs = []
+    for _, group in groups:
+        last_kvk_row = group.loc[group['KvK Numeric'].idxmax()] 
+        group['Governor Name'] = last_kvk_row['Governor Name'] 
+        updated_dfs.append(group)
+
+    updated_df = pd.concat(updated_dfs)
+
+    updated_df.drop(columns=['KvK Numeric'], inplace=True)
+
+    
+    if option != "All Kvk":
+        if option.lower() != "kvk1":
+            updated_df = updated_df[updated_df['KvK'] == option.lower()]
+        else:
+            updated_df = updated_df[updated_df['KvK'] == "KvK1"]
+
+
+    return updated_df
 
 
 def get_df_from_name(name):
@@ -92,9 +114,8 @@ df_grouped.reset_index(inplace=True)
 
 id_options = df_grouped["Governor ID"].tolist()
 name_options = df_grouped["Governor Name"].tolist()
-
-id_options.insert(0, "All ID")
 name_options.sort()
+id_options.insert(0, "All ID")
 name_options.insert(0, "All Names")
 
 df_grouped = df_grouped.sort_values(by="Total Kill Points",ascending=False).reset_index()   
@@ -181,17 +202,19 @@ with col4:
     st.dataframe(show_df,use_container_width=True)
 
 with col5:
-    fig_t5_t4 = px.pie(pie_df, values='T5-T4 Total Kills', names='KvK', title='T5-T4 Kill Distribution on KvKs')
-    fig_t5_t4.update_traces(marker=dict(colors=['#1f77b4', '#ff7f0e', '#2ca02c'], line=dict(color='#000000', width=2)))
-    fig_t5_t4.update_layout(template='plotly_dark')
+    for kvk in pie_df['KvK'].unique():
+        fig = px.pie(pie_df, values='T5-T4 Total Kills', names='KvK', title=f'T5-T4 Kill Distribution on KvK {kvk}',
+                     template='plotly_dark')
+        fig.update_traces(marker=dict(colors=['#1f77b4', '#ff7f0e', '#2ca02c'], line=dict(color='#000000', width=2)))
+        st.plotly_chart(fig, use_container_width=True)
 
-    st.plotly_chart(fig_t5_t4,use_container_width=True)
+# Animated pie chart for Dead Gain
 with col6:
-    fig_dead = px.pie(pie_df, values='Dead Gain', names='KvK', title='Dead Distribution on KvKs')
-    fig_dead.update_traces(marker=dict(colors=['#1f77b4', '#ff7f0e', '#2ca02c'], line=dict(color='#000000', width=2)))
-    fig_dead.update_layout(template='plotly_dark')
-
-    st.plotly_chart(fig_dead,use_container_width=True)
+    for kvk in pie_df['KvK'].unique():
+        fig = px.pie(pie_df, values='Dead Gain', names='KvK', title=f'Dead Distribution on KvK {kvk}',
+                     template='plotly_dark')
+        fig.update_traces(marker=dict(colors=['#1f77b4', '#ff7f0e', '#2ca02c'], line=dict(color='#000000', width=2)))
+        st.plotly_chart(fig, use_container_width=True)
 
 def format_tick_label(x):
     if abs(x) >= 1e9:
