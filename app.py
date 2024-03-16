@@ -203,7 +203,7 @@ with col4:
 
 with col5:
     for kvk in pie_df['KvK'].unique():
-        fig = px.pie(pie_df, values='T5-T4 Total Kills', names='KvK', title=f'T5-T4 Kill Distribution on KvK {kvk}',
+        fig = px.pie(pie_df, values='T5-T4 Total Kills', names='KvK', title=f'T5-T4 Kill Distribution',
                      template='plotly_dark')
         fig.update_traces(marker=dict(colors=['#1f77b4', '#ff7f0e', '#2ca02c'], line=dict(color='#000000', width=2)))
         st.plotly_chart(fig, use_container_width=True)
@@ -211,7 +211,7 @@ with col5:
 # Animated pie chart for Dead Gain
 with col6:
     for kvk in pie_df['KvK'].unique():
-        fig = px.pie(pie_df, values='Dead Gain', names='KvK', title=f'Dead Distribution on KvK {kvk}',
+        fig = px.pie(pie_df, values='Dead Gain', names='KvK', title=f'Dead Distribution',
                      template='plotly_dark')
         fig.update_traces(marker=dict(colors=['#1f77b4', '#ff7f0e', '#2ca02c'], line=dict(color='#000000', width=2)))
         st.plotly_chart(fig, use_container_width=True)
