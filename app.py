@@ -24,6 +24,15 @@ def format_tick_label(x):
     else:
         return str(x)
 
+st.markdown("""
+            
+            <style>
+            header{
+                visibility:hidden;
+            }
+            </style>
+            """,unsafe_allow_html=True)
+
 
 
 @st.cache_data
